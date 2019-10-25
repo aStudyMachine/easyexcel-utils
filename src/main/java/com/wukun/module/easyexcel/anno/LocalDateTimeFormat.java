@@ -1,4 +1,4 @@
-package com.luwei.module.easyexcel.anno;
+package com.wukun.module.easyexcel.anno;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
