@@ -1,10 +1,27 @@
-# 1. 概述
+# 1. 前言
 
-基于阿里的操作excel表开源项目EasyExcel , 封装了一些比较常用的方法以及 **自定义Converter(用于列数据的自定义转换)**, 按照模板项目上`ExcelUtils.java`现有的功能实现了同样效果的工具类 . 
+最近阿里开源的excel读写项目**EasyExcel**又火了起来 . 原来是项目又开始维护了, 从1.x 更新到2.x 了 , 而且迭代迅速 , 目前已经更新到 [2.1.0-beta3](https://mvnrepository.com/artifact/com.alibaba/easyexcel/2.1.0-beta3) 版本. 
 
-关于完整的EasyExcel 的使用 , 可以参考
+关于easyexcel , 其主要目的为**降低读取excel时的内存损耗** , **简化读写excel的api** .  
 
-https://github.com/alibaba/easyexcel/blob/master/quickstart.md
+同时2.x版本提供了很多新功能 , 具体大家可以直接参考官方说明吧 , github文档上写一清二楚 , 这里就不传播一些没啥必要的二三手知识了 , 而且目前该项目还在不停地迭代 , 给contributor一个star也是很有必要的 . :smile:
+
+官方地址 : [easyexcel仓库地址](https://github.com/alibaba/easyexcel)  , [easyexcel官网](https://alibaba-easyexcel.github.io/index.html)
+
+<br>
+
+这里我基于`easyexcel 2.0.5`版本简单封装了一个web读写excel的工具类 , 主要封装了如下功能 : 
+
+- 通过注解自定义`LocalDateTime`的读写格式
+- 通过注解自定义枚举类型的读写格式
+- 自定义`BaseExcelListener`抽象类封装了常用的数据处理逻辑 , 以及补充读取excel过程中读取发生错误被跳过的行号记录 . 
+
+- 封装了web的读写excel操作
+- ...
+
+下面列举主要功能以及相关示例 , 可以直接看源码 , 每个方法都有写完整的注释 , 如果觉得写得还凑合能看的话 , 给我这个刚毕业没多久的小菜鸡点个star呗 :smile:
+
+附上源码地址 :  https://github.com/aStudyMachine/easyexcel-utils  
 
 
 
@@ -12,28 +29,13 @@ https://github.com/alibaba/easyexcel/blob/master/quickstart.md
 
 ## 2.1 建立excel表每行数据与Java模型的映射
 
-**读写操作使用基于java模型**的方式  , 通过java类的属性与excel每一列的数据进行对应 
+easyexcel读写excel可以基于java 模型的方式 , 也可以使用`List<List<String>>` 的方式读写excel , 这里我读写操作使用**基于java模型**的方式  , 通过java类的属性与excel每一列的数据进行对应 
 
 关键注解 : `@ExcelProperty`
 
 具体如何使用注解建立java模型与Excel表数据的映射可以参考 `com.wukun.module.easyexcel.pojo`下的两个java模型类`Order` 类与`User`类
 
 ```java
-package com.wukun.module.easyexcel.pojo;
-
-import com.alibaba.excel.annotation.ExcelIgnore;
-import com.alibaba.excel.annotation.ExcelProperty;
-import com.wukun.module.easyexcel.anno.EnumFormat;
-import com.wukun.module.easyexcel.anno.LocalDateTimeFormat;
-import com.wukun.module.easyexcel.converter.EnumExcelConverter;
-import com.wukun.module.easyexcel.converter.LocalDateTimeExcelConverter;
-import com.wukun.module.easyexcel.envm.GenderEnum;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-
 /**
  * @author WuKun
  * @since 2019/10/09
@@ -112,13 +114,11 @@ public class User {
 
 
 
-
-
 ## 2.2 导出excel
 
 ### 2.2.1 相关API介绍
 
-导出excel 根据03 / 07版本分为两个不同的方法 ,分别为`EasyExcelUtil`类中以下两个方法  : 
+web导出excel 根据03 / 07版本分为两个不同的方法 ,分别为`EasyExcelUtil`类中以下两个方法  : 
 
 -   导出03版本 : `exportExcel2003Format(EasyExcelParams excelParams)`
 
@@ -174,7 +174,6 @@ public class EasyExcelParams implements Serializable {
         Assert.isTrue(ObjectUtils.allNotNull(excelNameWithoutExt, data, dataModelClazz, response), "导出excel参数不合法!");
         return this;
     }
-
 }
 ```
 
@@ -221,10 +220,6 @@ private void initData() {
 
 
 
-
-
-
-
 ## 2.3 读取excel
 
 ### 2.3.1 相关API介绍
@@ -254,28 +249,19 @@ public static void readExcel(MultipartFile excel, Class rowModel, BaseExcelListe
 }
 ```
 
--   easyexcel的读取操作需要自建一个类继承`AnalysisEventListener`抽象类 , 这里我创建`BaseExcelListener`类继承并重写读取excel的相关方法  , 每个方法的具体作用可直接查看方法头部注释 , 使用时直接创建一个listener类继承`BaseExcelListener`即可 , 如果默认的`BaseExcelListener`不满足需求 , 也可以直接自定义一个Listener 类实现 `AnalysisEventListener`并重写相关方法. 
+-   easyexcel的读取操作需要自建一个类继承`AnalysisEventListener`抽象类 , 这里我创建`BaseExcelListener`类继承并重写读取excel的相关方法  , 每个方法的具体作用可直接查看方法头部注释 , 使用时直接创建一个listener类继承`BaseExcelListener`即可 , 如果默认的`BaseExcelListener`不满足需求 , 也可以直接自定义一个Listener 类继承 `BaseExcelListener`并重写相应方法. 
 
 ```java
-import com.alibaba.excel.context.AnalysisContext;
-import com.alibaba.excel.event.AnalysisEventListener;
-import com.alibaba.fastjson.JSON;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-
-import java.util.*;
-
 /**
  * @author WuKun
  * @since 2019-10-10
  * <p>
  * 由于在实际中可能会根据不同的业务场景需要的读取到的不同的excel表的数据进行不同操作,
- * 所以这里将ExcelListener作为所有listener的基类,根据读取不同的java模型自定义一个listener类继承ExcelListener,
- * 根据不同的业务场景选择性对以下方法进行重写,具体如com.wukun.module.easyexcel.listener.OrderListener所示
+ * 所以这里将{@link BaseExcelListener}作为所有listener的父类,根据读取不同的java模型自定义一个listener类继承{@link BaseExcelListener},
+ * 根据不同的业务场景选择性对以下方法进行重写,具体如{@link OrderListener}所示
  * </p>
  *
- * <p>如果默认实现的方法不满足业务,则直接自定义一个listener实现AnalysisEventListener,重写一遍方法即可.</p>
+ * <p>如果默认实现的方法不满足业务,则直接自定义一个listener继承{@link BaseExcelListener},重写一遍方法即可.</p>
  */
 @Slf4j
 public abstract class BaseExcelListener<Model> extends AnalysisEventListener<Model> {
@@ -334,11 +320,6 @@ public abstract class BaseExcelListener<Model> extends AnalysisEventListener<Mod
      * 入库,继承该类后实现该方法即可
      */
     abstract void saveData();
-//    {
-//        log.info("模拟写入数据库");
-//        log.info("/*------- {} -------*/", JSON.toJSONString(data));
-//        data.clear();
-//    }
 
     /**
      * 解析监听器

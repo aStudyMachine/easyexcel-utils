@@ -14,11 +14,11 @@ import java.util.*;
  * @since 2019-10-10
  * <p>
  * 由于在实际中可能会根据不同的业务场景需要的读取到的不同的excel表的数据进行不同操作,
- * 所以这里将ExcelListener作为所有listener的基类,根据读取不同的java模型自定义一个listener类继承ExcelListener,
- * 根据不同的业务场景选择性对以下方法进行重写,具体如com.wukun.listener.OrderListener所示
+ * 所以这里将{@link BaseExcelListener}作为所有listener的父类,根据读取不同的java模型自定义一个listener类继承{@link BaseExcelListener},
+ * 根据不同的业务场景选择性对以下方法进行重写,具体如{@link OrderListener}所示
  * </p>
  *
- * <p>如果默认实现的方法不满足业务,则直接自定义一个listener实现AnalysisEventListener,重写一遍方法即可.</p>
+ * <p>如果默认实现的方法不满足业务,则直接自定义一个listener继承{@link BaseExcelListener},重写一遍方法即可.</p>
  */
 @Slf4j
 public abstract class BaseExcelListener<Model> extends AnalysisEventListener<Model> {
@@ -66,7 +66,7 @@ public abstract class BaseExcelListener<Model> extends AnalysisEventListener<Mod
         // 数据存储到list，供批量处理，或后续自己业务逻辑处理。
         data.add(object);
 
-        //如果continueAfterThrowing 为false 时保证数据插入的一致性
+        //如果continueAfterThrowing 为false 时保证数据插入的原子性
         if (data.size() >= BATCH_COUNT && continueAfterThrowing) {
             saveData();
             data.clear();
