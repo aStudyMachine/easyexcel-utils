@@ -1,15 +1,14 @@
-package com.wukun.module.easyexcel.pojo;
+package com.luwei.module.easyexcel.pojo;
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.wukun.module.easyexcel.anno.EnumFormat;
-import com.wukun.module.easyexcel.anno.LocalDateTimeFormat;
-import com.wukun.module.easyexcel.converter.EnumExcelConverter;
-import com.wukun.module.easyexcel.converter.LocalDateTimeExcelConverter;
-import com.wukun.module.easyexcel.envm.OrderStatusEnum;
+import com.luwei.module.easyexcel.anno.EnumFormat;
+import com.luwei.module.easyexcel.anno.LocalDateTimeFormat;
+import com.luwei.module.easyexcel.converter.EnumExcelConverter;
+import com.luwei.module.easyexcel.converter.LocalDateTimeExcelConverter;
+import com.luwei.module.easyexcel.envm.OrderStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -20,7 +19,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @AllArgsConstructor
-@Accessors(chain = true)
+//@Accessors(chain = true) 使用lombok该注解会导致无法正常读取到该数据
 @NoArgsConstructor //必须要保证无参构造方法存在,否则会报初始化对象失败
 public class Order {
 

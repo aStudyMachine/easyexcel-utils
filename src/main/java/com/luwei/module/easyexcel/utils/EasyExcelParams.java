@@ -1,4 +1,4 @@
-package com.wukun.module.easyexcel.utils;
+package com.luwei.module.easyexcel.utils;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -1,12 +1,14 @@
-package com.wukun.module.easyexcel.controller;
+package com.luwei.module.easyexcel.controller;
 
-import com.wukun.module.easyexcel.envm.OrderStatusEnum;
-import com.wukun.module.easyexcel.listener.UserListener;
-import com.wukun.module.easyexcel.pojo.Order;
-import com.wukun.module.easyexcel.pojo.User;
-import com.wukun.module.easyexcel.service.UserService;
-import com.wukun.module.easyexcel.utils.EasyExcelParams;
-import com.wukun.module.easyexcel.utils.EasyExcelUtil;
+import com.alibaba.fastjson.JSON;
+import com.luwei.module.easyexcel.envm.OrderStatusEnum;
+import com.luwei.module.easyexcel.listener.impl.UserListener;
+import com.luwei.module.easyexcel.pojo.ErrRows;
+import com.luwei.module.easyexcel.pojo.Order;
+import com.luwei.module.easyexcel.pojo.User;
+import com.luwei.module.easyexcel.service.UserService;
+import com.luwei.module.easyexcel.utils.EasyExcelParams;
+import com.luwei.module.easyexcel.utils.EasyExcelUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,11 +92,14 @@ public class FileController {
     private void initData() {
         if (CollectionUtils.isEmpty(data)) {
             for (int i = 0; i < 60000; i++) {
-                data.add(new Order().setPrice(BigDecimal.valueOf(11.11))
-                        .setCreateTime(LocalDateTime.now()).setGoodsName("香蕉")
-                        .setOrderId(i)
-                        .setNum(11)
-                        .setOrderStatus(OrderStatusEnum.PAYED));
+                Order order = new Order();
+                order.setPrice(BigDecimal.valueOf(11.11));
+                order.setCreateTime(LocalDateTime.now());
+                order.setGoodsName("香蕉");
+                order.setOrderId(i);
+                order.setNum(11);
+                order.setOrderStatus(OrderStatusEnum.PAYED);
+                data.add(order);
             }
         }
     }
@@ -130,7 +135,8 @@ public class FileController {
      */
     @PostMapping("/readExcel")
     public void readExcel(@RequestParam MultipartFile excel) {
-        EasyExcelUtil.readExcel(excel, User.class, new UserListener(userService));
+        List<ErrRows> errRows = EasyExcelUtil.readExcel(excel, User.class, new UserListener(userService));
+        log.info("/*------- 错误的行号数为 :  {}-------*/", JSON.toJSONString(errRows));
     }
 
 }

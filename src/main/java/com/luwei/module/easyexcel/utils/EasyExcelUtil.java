@@ -1,11 +1,12 @@
-package com.wukun.module.easyexcel.utils;
+package com.luwei.module.easyexcel.utils;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelReader;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.excel.write.metadata.WriteSheet;
-import com.wukun.module.easyexcel.listener.BaseExcelListener;
+import com.luwei.module.easyexcel.listener.BaseExcelListener;
+import com.luwei.module.easyexcel.pojo.ErrRows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
@@ -16,12 +17,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.Optional;
 
 /**
  * EasyExcel工具类
  *
- * @author wukun
+ * @author luwei
  * @since 2019/10/15
  */
 @Slf4j
@@ -98,8 +100,10 @@ public class EasyExcelUtil {
      * @param excel    文件
      * @param rowModel 实体类映射
      * @param listener 用于读取excel的listener
+     * @return 错误的行号
      */
-    public static void readExcel(MultipartFile excel, Class rowModel, BaseExcelListener listener) {
+    @SuppressWarnings("unchecked")
+    public static List<ErrRows> readExcel(MultipartFile excel, Class rowModel, BaseExcelListener listener) {
         ExcelReader reader = getReader(excel, rowModel, listener);
         try {
             Assert.notNull(reader, "导入Excel失败!");
@@ -111,6 +115,7 @@ public class EasyExcelUtil {
             // 这里千万别忘记关闭,读的时候会创建临时文件,到时磁盘会崩的
             Optional.ofNullable(reader).ifPresent(ExcelReader::finish);
         }
+        return listener.getErrRowsList();
     }
 
     /**

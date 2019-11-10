@@ -1,11 +1,11 @@
-package com.wukun.module.easyexcel.converter;
+package com.luwei.module.easyexcel.converter;
 
 import com.alibaba.excel.converters.Converter;
 import com.alibaba.excel.enums.CellDataTypeEnum;
 import com.alibaba.excel.metadata.CellData;
 import com.alibaba.excel.metadata.GlobalConfiguration;
 import com.alibaba.excel.metadata.property.ExcelContentProperty;
-import com.wukun.module.easyexcel.anno.LocalDateTimeFormat;
+import com.luwei.module.easyexcel.anno.LocalDateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -58,7 +58,8 @@ public class LocalDateTimeExcelConverter implements Converter<LocalDateTime> {
      */
     @Override
     public CellData convertToExcelData(LocalDateTime value, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
-        return new CellData(value.format(DateTimeFormatter.ofPattern(DEFAULT_PATTERN)));
+        LocalDateTimeFormat annotation = contentProperty.getField().getAnnotation(LocalDateTimeFormat.class);
+        return new CellData(value.format(DateTimeFormatter.ofPattern(Objects.nonNull(annotation) ? annotation.value() : DEFAULT_PATTERN)));
     }
 
 }
