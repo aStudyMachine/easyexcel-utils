@@ -1,5 +1,6 @@
 package com.luwei.module.easyexcel.utils;
 
+import com.alibaba.excel.write.handler.WriteHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -43,6 +44,11 @@ public class EasyExcelParams implements Serializable {
      * 响应
      */
     private HttpServletResponse response;
+
+    /**
+     * 样式集合
+     */
+    private List<WriteHandler> writeHandlers;
 
 
     public EasyExcelParams() {

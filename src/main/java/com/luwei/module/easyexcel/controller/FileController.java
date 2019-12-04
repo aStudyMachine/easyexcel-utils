@@ -1,5 +1,9 @@
 package com.luwei.module.easyexcel.controller;
 
+import com.alibaba.excel.write.handler.WriteHandler;
+import com.alibaba.excel.write.metadata.style.WriteCellStyle;
+import com.alibaba.excel.write.metadata.style.WriteFont;
+import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
 import com.alibaba.fastjson.JSON;
 import com.luwei.module.easyexcel.envm.OrderStatusEnum;
 import com.luwei.module.easyexcel.listener.impl.UserListener;
@@ -11,6 +15,8 @@ import com.luwei.module.easyexcel.utils.EasyExcelParams;
 import com.luwei.module.easyexcel.utils.EasyExcelUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -123,6 +129,82 @@ public class FileController {
         long end = System.currentTimeMillis();
 
         log.info("-----EasyExcelUtils : 导出成功,导出excel花费时间为 : " + ((end - begin) / 1000) + "秒");
+    }
+
+    /**
+     * 使用EasyExcelUtils 导出Excel 2007
+     *
+     * @param response HttpServletResponse
+     * @throws Exception exception
+     */
+    @GetMapping("/styleExport2003")
+    public void styleExport2003(HttpServletResponse response) throws Exception {
+        initData();
+        //设置参数
+        EasyExcelParams params = new EasyExcelParams().setResponse(response)
+                .setExcelNameWithoutExt("Order(xls)")
+                .setSheetName("第一张sheet")
+                .setData(data)
+                .setWriteHandlers(getWriteHandler())
+                .setDataModelClazz(Order.class)
+                .checkValid();
+
+        long begin = System.currentTimeMillis();
+        EasyExcelUtil.exportExcel2003(params);
+        long end = System.currentTimeMillis();
+
+        log.info("-----EasyExcelUtils : 导出成功,导出excel花费时间为 : " + ((end - begin) / 1000) + "秒");
+    }
+
+    /**
+     * 使用EasyExcelUtils 导出Excel 2007
+     *
+     * @param response HttpServletResponse
+     * @throws Exception exception
+     */
+    @GetMapping("/styleExport2007")
+    public void styleExport2007(HttpServletResponse response) throws Exception {
+        initData();
+        //设置参数
+        EasyExcelParams params = new EasyExcelParams().setResponse(response)
+                .setExcelNameWithoutExt("Order(xlsx)")
+                .setSheetName("第一张sheet")
+                .setData(data)
+                .setWriteHandlers(getWriteHandler())
+                .setDataModelClazz(Order.class)
+                .checkValid();
+
+        long begin = System.currentTimeMillis();
+        EasyExcelUtil.exportExcel2007(params);
+        long end = System.currentTimeMillis();
+
+        log.info("-----EasyExcelUtils : 导出成功,导出excel花费时间为 : " + ((end - begin) / 1000) + "秒");
+    }
+
+    /**
+     * 获取样式集合
+     *
+     * @return
+     */
+    private List<WriteHandler> getWriteHandler() {
+        // 表头样式
+        WriteCellStyle headWriteCellStyle = new WriteCellStyle();
+        WriteFont headWriteFont = new WriteFont();
+        headWriteFont.setFontHeightInPoints((short)10);
+        headWriteFont.setColor(IndexedColors.RED.getIndex());
+        headWriteCellStyle.setWriteFont(headWriteFont);
+        // headWriteCellStyle.setFillForegroundColor(IndexedColors.BLACK.getIndex());
+        // 内容样式
+        WriteCellStyle contentWriteCellStyle = new WriteCellStyle();
+        contentWriteCellStyle.setHorizontalAlignment(HorizontalAlignment.CENTER);
+        HorizontalCellStyleStrategy horizontalCellStyleStrategy =
+                new HorizontalCellStyleStrategy(headWriteCellStyle, contentWriteCellStyle);
+        List<WriteHandler> writeHandlers = new ArrayList<>();
+        writeHandlers.add(horizontalCellStyleStrategy);
+        // OnceAbsoluteMergeStrategy onceAbsoluteMergeStrategy = new OnceAbsoluteMergeStrategy(0,0, 5,6);
+        // LoopMergeStrategy loopMergeStrategy = new LoopMergeStrategy(2, 0);
+        // writeHandlers.add(loopMergeStrategy);
+        return writeHandlers;
     }
 
     @Autowired
