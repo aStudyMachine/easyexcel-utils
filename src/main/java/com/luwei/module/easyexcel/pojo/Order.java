@@ -1,6 +1,7 @@
 package com.luwei.module.easyexcel.pojo;
 
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.write.style.ColumnWidth;
 import com.luwei.module.easyexcel.anno.EnumFormat;
 import com.luwei.module.easyexcel.anno.LocalDateTimeFormat;
 import com.luwei.module.easyexcel.converter.EnumExcelConverter;
@@ -54,8 +55,12 @@ public class Order {
             toJavaEnum = {"UNPAY", "PAYED", "RECEIVED"})
     private OrderStatusEnum orderStatus;
 
+    /**
+     * ColumnWidth: 设置行宽
+     */
     @ExcelProperty(value = "下单时间", converter = LocalDateTimeExcelConverter.class)
     @LocalDateTimeFormat("yyyy-MM-dd HH:mm:ss")
+    @ColumnWidth(20)
     private LocalDateTime createTime;
 
 //    @ExcelProperty(value = "下单时间")

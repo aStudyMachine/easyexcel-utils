@@ -4,12 +4,15 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelReader;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.support.ExcelTypeEnum;
+import com.alibaba.excel.write.builder.ExcelWriterBuilder;
+import com.alibaba.excel.write.handler.WriteHandler;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.luwei.module.easyexcel.listener.BaseExcelListener;
 import com.luwei.module.easyexcel.pojo.ErrRows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
@@ -56,7 +59,7 @@ public class EasyExcelUtil {
      * @param excelType   excel类型枚举 03 or 07
      * @throws IOException IOException
      */
-    private static void exportExcel(EasyExcelParams excelParams, ExcelTypeEnum excelType) throws IOException {
+    /*private static void exportExcel(EasyExcelParams excelParams, ExcelTypeEnum excelType) throws IOException {
         HttpServletResponse response = excelParams.getResponse();
 
         ServletOutputStream out = response.getOutputStream();
@@ -71,6 +74,27 @@ public class EasyExcelUtil {
             Optional.ofNullable(writer).ifPresent(ExcelWriter::finish);
         }
 
+    }*/
+
+    /**
+     * 根据参数和版本枚举导出excel文件
+     *
+     * @param excelParams 参数实体
+     * @param excelType   excel类型枚举 03 or 07
+     * @throws IOException IOException
+     */
+    private static void exportExcel(EasyExcelParams excelParams, ExcelTypeEnum excelType) throws IOException {
+        HttpServletResponse response = excelParams.getResponse();
+        prepareResponds(response, excelParams.getExcelNameWithoutExt(), excelType);
+
+        ExcelWriterBuilder excelWriterBuilder = EasyExcel.write(response.getOutputStream(), excelParams.getDataModelClazz());
+        List<WriteHandler> writeHandlers = excelParams.getWriteHandlers();
+        if (!CollectionUtils.isEmpty(writeHandlers)) {
+            for (WriteHandler writeHandler : writeHandlers) {
+                excelWriterBuilder.registerWriteHandler(writeHandler);
+            }
+        }
+        excelWriterBuilder.sheet(excelParams.getSheetName()).doWrite(excelParams.getData());
     }
 
     /**
